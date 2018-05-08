@@ -3,6 +3,10 @@ import './App.css';
 
 import constants from './constants';
 
+import {
+  Button, Loader, Dimmer, Grid, Header, Form, Segment 
+} from 'semantic-ui-react';
+
 class App extends Component {
   state = {
     auth_token: null,
@@ -80,21 +84,38 @@ class App extends Component {
     const { isSignedIn, isLoad } = this.state;
 
     return (
-      <div className="App">
+      <div className='login'>
         {!isLoad && (
-          <span>Loading...</span>
+          <Dimmer active>
+            <Loader size="big">Loading</Loader>
+          </Dimmer>
         )}
 
         {isLoad && (
-          !isSignedIn && (<button id="authorize-button" 
-            onClick={this.handleAuthClick}>Authorize</button>
-          )
-        )}
+          <Grid
+            className='login-grid'
+            textAlign='center'
+            verticalAlign='middle'
+          >
+            <Grid.Column className='login-column'>
+              <Header as='h2' color='teal' textAlign='center'>
+                Log-in to your account
+              </Header>
+              <Form size='large'>
+                <Segment stacked>
+                  {!isSignedIn && (
+                    <Button color='teal' fluid size='large'
+                      onClick={this.handleAuthClick}>Authorize</Button>
+                  )}
 
-        {isLoad && (
-          isSignedIn && (<button id="signout-button"
-            onClick={this.handleSignoutClick}>Sign Out</button>
-          )
+                  {isSignedIn && (
+                    <Button color='red' fluid size='large' 
+                      onClick={this.handleSignoutClick}>Sign Out</Button>
+                  )}
+                </Segment>
+              </Form>
+            </Grid.Column>
+          </Grid>
         )}
       </div>
     );

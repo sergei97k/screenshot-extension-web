@@ -1,0 +1,10 @@
+body > div,
+body > div > div,
+body > div > div > div.login,
+.login-grid {
+  height: 100%;
+}
+
+.login-column {
+  max-width: 450px;
+}
