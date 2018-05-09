@@ -8,6 +8,7 @@ export default function withGapiInit(Component) {
       auth_token: null,
       isSignedIn: false,
       isLoad: false,
+      userName: null,
     };
 
     componentDidMount() {
@@ -54,11 +55,12 @@ export default function withGapiInit(Component) {
      *  appropriately. After a sign-in, the API is called.
      */
     updateSigninStatus(isSignedIn, self) {
-      const { gapi } = window;
+      const currentUser = window.gapi.auth2.getAuthInstance().currentUser.get();
       
       self.setState({
         isSignedIn,
-        auth_token: gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token || null,
+        auth_token: currentUser.getAuthResponse().access_token || null,
+        userName: isSignedIn ? currentUser.getBasicProfile().getName() : null,
       });
     }
   
@@ -77,13 +79,15 @@ export default function withGapiInit(Component) {
     }
 
     render() {
-      const { isLoad, isSignedIn } = this.state;
+      const { isLoad, isSignedIn, userName, auth_token } = this.state;
 
       return (
         <Component 
           {...this.props}
           isLoad={isLoad}
           isSignedIn={isSignedIn}
+          userName={userName}
+          auth_token={auth_token}
           handleAuthClick={this.handleAuthClick}
           handleSignoutClick={this.handleSignoutClick}
         />
