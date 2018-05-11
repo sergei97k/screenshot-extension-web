@@ -24,7 +24,7 @@ const App = ({ isLoad, isSignedIn, handleAuthClick, handleSignoutClick, userName
           textAlign='center'
           verticalAlign='middle'
         >
-          <Grid.Column className='login-column'>
+          <Grid.Column className={!isSignedIn ? 'login-column--small' : 'login-column'}>
             <Header as='h2' color='teal' textAlign='center'>
               {!isSignedIn && (
                 <span>Авторизируйтесь с помощью Google аккаунта</span>

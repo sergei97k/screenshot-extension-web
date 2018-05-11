@@ -13,6 +13,9 @@ body > div > div > div.login,
 .login-column {
   max-width: 650px;
 }
+.login-column--small {
+  max-width: 350px;
+}
 .login-user-header {
   display: flex;
   justify-content: space-between;
