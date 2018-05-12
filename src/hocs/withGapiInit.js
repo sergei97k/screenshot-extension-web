@@ -12,6 +12,7 @@ export default function withGapiInit(Component) {
     };
 
     componentDidMount() {
+      console.log(process.env);
       const self = this;
       const gapiScript = document.createElement('script');
       gapiScript.src = 'https://apis.google.com/js/api.js?onload=onGapiLoad';
