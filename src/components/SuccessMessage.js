@@ -16,8 +16,8 @@ class SuccessMessage extends React.Component {
       });
 
       if (!this.state.timer) {
-        // localStorage.remove
-        // document.location.assign('https://drive.google.com/drive/my-drive');
+        localStorage.removeItem('screenshotData');
+        document.location.assign('https://drive.google.com/drive/my-drive');
       }
     }, 1000);
   }

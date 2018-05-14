@@ -22,7 +22,7 @@ class SaveImage extends React.Component {
   };
 
   componentDidMount() {
-    const imageUrl = localStorage.screenshotData ? JSON.parse(localStorage.screenshotData) : null;
+    const imageUrl = localStorage.screenshotData || null;
     this.setState({
       imageUrl,
     });
@@ -54,16 +54,24 @@ class SaveImage extends React.Component {
       'mimeType': contentType
     };
 
-    const body = `${delimiter}` +
-      `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-      `${JSON.stringify(metadata)}` +
-      `${delimiter}` +
-      `Content-Type: ${contentType}\r\n` +
-      `Content-Transfer-Encoding: base64\r\n\r\n` +
-      `${base64Str}` +
-      `${close_delim}`;
+    api.createFolder(auth_token, 'Screenshot Extension Web')
+      .then(
+        res => {
+          metadata.parents = [res.data.id];
 
-    api.postImage(auth_token, boundary, body)
+          const body = `${delimiter}` +
+            `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+            `${JSON.stringify(metadata)}` +
+            `${delimiter}` +
+            `Content-Type: ${contentType}\r\n` +
+            `Content-Transfer-Encoding: base64\r\n\r\n` +
+            `${base64Str}` +
+            `${close_delim}`;
+
+          return api.postImage(auth_token, boundary, body);
+        },
+        console.error
+      )
       .then(
         res => {
           this.setState({
@@ -83,6 +91,7 @@ class SaveImage extends React.Component {
 
   render() {
     const { isLoad, imageUrl, value, isSaveImage, imageData } = this.state;
+    const { auth_token } = this.props;
 
     return (
       <div className="save-image-container">
@@ -104,7 +113,7 @@ class SaveImage extends React.Component {
           </Dimmer.Dimmable>
         )}
 
-        {isLoad && imageUrl && !imageData && (
+        {isLoad && imageUrl && !imageData && auth_token && (
           <SaveForm 
             value={value}
             imageUrl={imageUrl}
@@ -112,7 +121,7 @@ class SaveImage extends React.Component {
             onChange={this.onChange} />
         )}
 
-        {isLoad && !imageUrl && (
+        {isLoad && (!imageUrl || !auth_token) && (
           <Message negative>
             <Message.Header>Упс, что-то пошло не так!</Message.Header>
             <p>Попробуйте сделать скриншот снова</p>
