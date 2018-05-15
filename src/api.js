@@ -48,6 +48,19 @@ const api = {
         }
       }
     )
+  },
+  getFolderList(auth_token, query) {
+    return axios.get(
+      'https://www.googleapis.com/drive/v3/files',
+      {
+        params: {
+          q: query
+        },
+        headers: {
+         'Authorization': `Bearer ${auth_token}`
+        }
+      }
+    )
   }
 }
 

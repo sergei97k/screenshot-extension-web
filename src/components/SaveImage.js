@@ -12,6 +12,8 @@ import {
 import SaveForm from './SaveForm';
 import SuccessMessage from './SuccessMessage';
 
+import constants from '../constants';
+
 class SaveImage extends React.Component {
   state = {
     isLoad: false,
@@ -19,6 +21,7 @@ class SaveImage extends React.Component {
     value: '',
     imageUrl: null,
     imageData: null,
+    folderId: null,
   };
 
   componentDidMount() {
@@ -54,33 +57,73 @@ class SaveImage extends React.Component {
       'mimeType': contentType
     };
 
-    api.createFolder(auth_token, 'Screenshot Extension Web')
+    const search = `name='${constants.FOLDER_NAME}'`;
+
+    api.getFolderList(auth_token, search)
       .then(
         res => {
-          metadata.parents = [res.data.id];
+          if (res.data.files.length) {
+            metadata.parents = [res.data.files[0].id];
 
-          const body = `${delimiter}` +
-            `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-            `${JSON.stringify(metadata)}` +
-            `${delimiter}` +
-            `Content-Type: ${contentType}\r\n` +
-            `Content-Transfer-Encoding: base64\r\n\r\n` +
-            `${base64Str}` +
-            `${close_delim}`;
+            this.setState({
+              folderId: res.data.files[0].id,
+            })
 
-          return api.postImage(auth_token, boundary, body);
+            const body = `${delimiter}` +
+              `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+              `${JSON.stringify(metadata)}` +
+              `${delimiter}` +
+              `Content-Type: ${contentType}\r\n` +
+              `Content-Transfer-Encoding: base64\r\n\r\n` +
+              `${base64Str}` +
+              `${close_delim}`;
+
+              api.postImage(auth_token, boundary, body)
+                .then(
+                  res => {
+                    this.setState({
+                      isSaveImage: false,
+                      imageData: res.data,
+                    });
+                  },
+                  console.error
+                );
+          } else {
+            api.createFolder(auth_token, constants.FOLDER_NAME)
+              .then(
+                res => {
+                  metadata.parents = [res.data.id];
+
+                  this.setState({
+                    folderId: res.data.id,
+                  })
+
+                  const body = `${delimiter}` +
+                    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+                    `${JSON.stringify(metadata)}` +
+                    `${delimiter}` +
+                    `Content-Type: ${contentType}\r\n` +
+                    `Content-Transfer-Encoding: base64\r\n\r\n` +
+                    `${base64Str}` +
+                    `${close_delim}`;
+
+                  return api.postImage(auth_token, boundary, body);
+                },
+                console.error
+              )
+              .then(
+                res => {
+                  this.setState({
+                    isSaveImage: false,
+                    imageData: res.data,
+                  });
+                },
+                console.error
+              );
+          }
         },
         console.error
       )
-      .then(
-        res => {
-          this.setState({
-            isSaveImage: false,
-            imageData: res.data,
-          });
-        },
-        console.error
-      );
   }
 
   onChange = event => {
@@ -90,7 +133,7 @@ class SaveImage extends React.Component {
   }
 
   render() {
-    const { isLoad, imageUrl, value, isSaveImage, imageData } = this.state;
+    const { isLoad, imageUrl, value, isSaveImage, imageData, folderId } = this.state;
     const { auth_token } = this.props;
 
     return (
@@ -135,7 +178,7 @@ class SaveImage extends React.Component {
         )}
 
         {imageData && (
-          <SuccessMessage imageData={imageData} />
+          <SuccessMessage folderId={folderId} imageData={imageData} />
         )}
       </div>
     ); 

@@ -17,7 +17,7 @@ class SuccessMessage extends React.Component {
 
       if (!this.state.timer) {
         localStorage.removeItem('screenshotData');
-        document.location.assign('https://drive.google.com/drive/my-drive');
+        document.location.assign(`https://drive.google.com/drive/folders/${this.props.folderId}`);
       }
     }, 1000);
   }
